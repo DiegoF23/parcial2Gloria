@@ -9,24 +9,19 @@
       "id": "2",
       "nombre": "Recursos Humanos",
       "responsable": "Lic. Ana Gómez"
-    },
-    {
-      "nombre": "Tecnicos",
-      "responsable": "Juan Perez",
-      "id": "7d-bJwT8CN4"
     }
   ],
   "empleados": [
     {
       "id": "1",
-      "departamentoId": 1,
+      "departamentoId": "1",
       "nombre": "Laura Martínez",
       "cargo": "Desarrolladora",
       "fechaIngreso": "2024-03-01"
     },
     {
       "id": "2",
-      "departamentoId": 2,
+      "departamentoId": "2",
       "nombre": "Pedro Ramírez",
       "cargo": "Analista RRHH",
       "fechaIngreso": "2024-05-10"
@@ -35,7 +30,7 @@
   "asistencias": [
     {
       "id": "1",
-      "empleadoId": 1,
+      "empleadoId": "1",
       "fecha": "2025-06-15",
       "estado": "Presente"
     }

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", iniciarApp);
 
 async function iniciarApp() {
     formDepartamento.addEventListener("submit", guardarDepartamento);
-    //btnCancelarDepartamento.addEventListener("click",cancelarEdicionDepartamento);
+    btnCancelarDepartamento.addEventListener("click",cancelarEdicionDepartamento);
 
     await cargarDepartamentos();
 }
@@ -43,8 +43,12 @@ function renderizarDepartamentos(departamentos, empleados) {
                 <h3>${departamento.nombre}</h3>
                 <p>Responsable: ${departamento.responsable}</p>
                 <p>Cantidad de empleados: ${empleadosDelDepartamento.length}</p>
+
+                <button onclick="editarDepartamento(${departamento.id})">Editar</button>
+                <button onclick="eliminarDepartamento(${departamento.id})">Eliminar</button>
             </div>
         `;
+       
     });
 }
 
@@ -78,4 +82,22 @@ async function guardarDepartamento(event) {
     } catch (error) {
         console.error("Error al guardar departamento:", error);
     }
+}
+
+async function editarDepartamento(id) {
+    try {
+        const response = await axios.get(`${API_URL}/departamentos/${id}`);
+        const departamento = response.data;
+        
+        inputDepartamentoId.value = departamento.id;
+        inputDepartamentoNombre.value = departamento.nombre;
+        inputDepartamentoResponsable.value = departamento.responsable;
+    } catch (error) {
+        console.error("Error al cargar departamento para editar:", error);
+    }
+}
+
+function cancelarEdicionDepartamento() {
+    formDepartamento.reset();
+    inputDepartamentoId.value = "";
 }
