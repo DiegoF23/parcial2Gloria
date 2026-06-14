@@ -88,7 +88,7 @@ async function editarDepartamento(id) {
     try {
         const response = await axios.get(`${API_URL}/departamentos/${id}`);
         const departamento = response.data;
-        
+
         inputDepartamentoId.value = departamento.id;
         inputDepartamentoNombre.value = departamento.nombre;
         inputDepartamentoResponsable.value = departamento.responsable;
@@ -100,4 +100,34 @@ async function editarDepartamento(id) {
 function cancelarEdicionDepartamento() {
     formDepartamento.reset();
     inputDepartamentoId.value = "";
+}
+
+async function eliminarDepartamento(id) {
+    const confirmar = confirm("¿Seguro que desea eliminar este departamento y todos sus datos asociados?");
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+        const responseEmpleados = await axios.get(`${API_URL}/empleados?departamentoId=${id}`);
+        const empleados = responseEmpleados.data;
+
+        for (const empleado of empleados) {
+            const responseAsistencias = await axios.get(`${API_URL}/asistencias?empleadoId=${empleado.id}`);
+            const asistencias = responseAsistencias.data;
+
+            for (const asistencia of asistencias) {
+                await axios.delete(`${API_URL}/asistencias/${asistencia.id}`);
+            }
+
+            await axios.delete(`${API_URL}/empleados/${empleado.id}`);
+        }
+
+        await axios.delete(`${API_URL}/departamentos/${id}`);
+
+        await cargarDepartamentos();
+    } catch (error) {
+        console.error("Error al eliminar departamento:", error);
+    }
 }
