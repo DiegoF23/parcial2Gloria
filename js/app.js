@@ -44,8 +44,8 @@ function renderizarDepartamentos(departamentos, empleados) {
                 <p>Responsable: ${departamento.responsable}</p>
                 <p>Cantidad de empleados: ${empleadosDelDepartamento.length}</p>
 
-                <button onclick="editarDepartamento(${departamento.id})">Editar</button>
-                <button onclick="eliminarDepartamento(${departamento.id})">Eliminar</button>
+                <button class="btn-edit" onclick="editarDepartamento(${departamento.id})">Editar</button>
+                <button  class="btn-danger" onclick="eliminarDepartamento(${departamento.id})">Eliminar</button>
             </div>
         `;
        
