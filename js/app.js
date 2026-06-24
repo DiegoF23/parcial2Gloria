@@ -1,6 +1,8 @@
 const API_URL = "http://localhost:3000";
 
 const contenedorDepartamentos = document.getElementById("contenedor-departamentos");
+const contenedorEmpleados = document.getElementById("contenedor-empleados");
+const contenedorAsistencias = document.getElementById("contenedor-asistencias");
 const formDepartamento = document.getElementById("form-departamento");
 const inputDepartamentoId = document.getElementById("departamento-id");
 const inputDepartamentoNombre = document.getElementById("departamento-nombre");
@@ -13,7 +15,13 @@ async function iniciarApp() {
     formDepartamento.addEventListener("submit", guardarDepartamento);
     btnCancelarDepartamento.addEventListener("click",cancelarEdicionDepartamento);
 
+    await cargarDatos();
+}
+
+async function cargarDatos() {
     await cargarDepartamentos();
+    await cargarEmpleados();
+    await cargarAsistencias();
 }
 
 async function cargarDepartamentos() {
@@ -52,6 +60,75 @@ function renderizarDepartamentos(departamentos, empleados) {
     });
 }
 
+async function cargarEmpleados() {
+    try {
+        const responseEmpleados = await axios.get(`${API_URL}/empleados`);
+        const empleados = responseEmpleados.data;
+
+        const responseDepartamentos = await axios.get(`${API_URL}/departamentos`);
+        const departamentos = responseDepartamentos.data;
+
+        renderizarEmpleados(empleados, departamentos);
+    } catch (error) {
+        console.error("Error al cargar empleados:", error);
+    }
+}
+
+function renderizarEmpleados(empleados, departamentos) {
+    contenedorEmpleados.innerHTML = "";
+
+    empleados.forEach(function(empleado) {
+        const departamento = departamentos.find(function(item) {
+            return item.id === empleado.departamentoId;
+        });
+
+        const nombreDepartamento = departamento ? departamento.nombre : "Sin departamento";
+
+        contenedorEmpleados.innerHTML += `
+            <div class="card">
+                <h3>${empleado.nombre}</h3>
+                <p>Cargo: ${empleado.cargo}</p>
+                <p>Departamento: ${nombreDepartamento}</p>
+                <p>Fecha de ingreso: ${empleado.fechaIngreso}</p>
+            </div>
+        `;
+    });
+}
+
+async function cargarAsistencias() {
+    try {
+        const responseAsistencias = await axios.get(`${API_URL}/asistencias`);
+        const asistencias = responseAsistencias.data;
+
+        const responseEmpleados = await axios.get(`${API_URL}/empleados`);
+        const empleados = responseEmpleados.data;
+
+        renderizarAsistencias(asistencias, empleados);
+    } catch (error) {
+        console.error("Error al cargar asistencias:", error);
+    }
+}
+
+function renderizarAsistencias(asistencias, empleados) {
+    contenedorAsistencias.innerHTML = "";
+
+    asistencias.forEach(function(asistencia) {
+        const empleado = empleados.find(function(item) {
+            return item.id === asistencia.empleadoId;
+        });
+
+        const nombreEmpleado = empleado ? empleado.nombre : "Empleado eliminado";
+
+        contenedorAsistencias.innerHTML += `
+            <div class="card">
+                <h3>${nombreEmpleado}</h3>
+                <p>Fecha: ${asistencia.fecha}</p>
+                <p>Estado: ${asistencia.estado}</p>
+            </div>
+        `;
+    });
+}
+
 async function guardarDepartamento(event) {
     event.preventDefault();
 
@@ -78,7 +155,7 @@ async function guardarDepartamento(event) {
         formDepartamento.reset();
         inputDepartamentoId.value = "";
 
-        await cargarDepartamentos();
+        await cargarDatos();
     } catch (error) {
         console.error("Error al guardar departamento:", error);
     }
@@ -126,7 +203,7 @@ async function eliminarDepartamento(id) {
 
         await axios.delete(`${API_URL}/departamentos/${id}`);
 
-        await cargarDepartamentos();
+        await cargarDatos();
     } catch (error) {
         console.error("Error al eliminar departamento:", error);
     }

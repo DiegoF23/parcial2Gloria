@@ -1,26 +1,26 @@
 {
   "departamentos": [
     {
-      "id": "1",
+      "id": 1,
       "nombre": "Sistemas",
       "responsable": "Ing. Carlos Pérez"
     },
     {
-      "id": "2",
+      "id": 2,
       "nombre": "Recursos Humanos",
       "responsable": "Lic. Ana Gómez"
     }
   ],
   "empleados": [
     {
-      "id": "1",
+      "id": 1,
       "departamentoId": 1,
       "nombre": "Laura Martínez",
       "cargo": "Desarrolladora",
       "fechaIngreso": "2024-03-01"
     },
     {
-      "id": "2",
+      "id": 2,
       "departamentoId": 2,
       "nombre": "Pedro Ramírez",
       "cargo": "Analista RRHH",
@@ -29,11 +29,10 @@
   ],
   "asistencias": [
     {
-      "id": "1",
+      "id": 1,
       "empleadoId": 1,
       "fecha": "2025-06-15",
       "estado": "Presente"
     }
-  ],
-  "$schema": "./node_modules/json-server/schema.json"
+  ]
 }
