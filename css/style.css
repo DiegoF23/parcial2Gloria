@@ -68,3 +68,18 @@ button:hover {
     background-color: lightblue;
     color: black;
 }
+
+.card button {
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.btn-danger {
+    background-color: tomato;
+    color: white;
+}
+
+.btn-edit {
+    background-color: lightblue;
+    color: black;
+}
