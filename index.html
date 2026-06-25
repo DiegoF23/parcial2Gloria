@@ -69,11 +69,34 @@
         <div id="contenedor-empleados"></div>
       </section>
 
-      <section id="seccion-asistencias">
-        <h2>Asistencias</h2>
-        <div id="contenedor-asistencias"></div>
-      </section>
+
+
+
+  <section id="seccion-asistencias">
+    <h2>Asistencias</h2>
+
+    <form id="form-asistencia">
+        <select id="asistencia-empleado">
+            <option value="">Seleccione empleado</option>
+        </select>
+
+        <button type="submit">Registrar presente</button>
+    </form>
+
+    <label for="filtro-empleado-asistencia">Ver historial de:</label>
+    <select id="filtro-empleado-asistencia">
+        <option value="">Todos los empleados</option>
+    </select>
+
+    <div id="contenedor-asistencias"></div>
+</section>
+
+
+
+
+
     </main>
+
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="js/app.js"></script>

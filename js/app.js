@@ -13,6 +13,9 @@ const filtroDepartamento = document.getElementById("filtro-departamento");
 const btnCancelarEmpleado = document.getElementById("btn-cancelar-empleado");
 
 
+const formAsistencia = document.getElementById("form-asistencia");
+const selectAsistenciaEmpleado = document.getElementById("asistencia-empleado");
+const filtroEmpleadoAsistencia = document.getElementById("filtro-empleado-asistencia");
 const contenedorAsistencias = document.getElementById("contenedor-asistencias");
 const formDepartamento = document.getElementById("form-departamento");
 const inputDepartamentoId = document.getElementById("departamento-id");
@@ -30,6 +33,10 @@ async function iniciarApp() {
     btnCancelarEmpleado.addEventListener("click", cancelarEdicionEmpleado);
     filtroDepartamento.addEventListener("change", cargarEmpleados);
 
+
+    formAsistencia.addEventListener("submit", registrarAsistencia);
+    filtroEmpleadoAsistencia.addEventListener("change", cargarAsistencias);
+
     await cargarDatos();
 }
 
@@ -37,9 +44,68 @@ async function cargarDatos() {
     await cargarDepartamentos();
      await cargarSelectDepartamentos();
     await cargarEmpleados();
+    await cargarSelectEmpleados();
     await cargarAsistencias();
    
 }
+
+
+async function cargarSelectEmpleados() {
+    try {
+        const response = await axios.get(`${API_URL}/empleados`);
+        const empleados = response.data;
+
+        selectAsistenciaEmpleado.innerHTML = `
+            <option value="">Seleccione empleado</option>
+        `;
+
+        filtroEmpleadoAsistencia.innerHTML = `
+            <option value="">Todos los empleados</option>
+        `;
+
+        empleados.forEach(function(empleado) {
+            selectAsistenciaEmpleado.innerHTML += `
+                <option value="${empleado.id}">${empleado.nombre}</option>
+            `;
+
+            filtroEmpleadoAsistencia.innerHTML += `
+                <option value="${empleado.id}">${empleado.nombre}</option>
+            `;
+        });
+    } catch (error) {
+        console.error("Error al cargar empleados en selects:", error);
+    }
+}
+
+
+async function registrarAsistencia(event) {
+    event.preventDefault();
+
+    const empleadoId = Number(selectAsistenciaEmpleado.value);
+
+    if (selectAsistenciaEmpleado.value === "") {
+        alert("Seleccione un empleado.");
+        return;
+    }
+
+    const nuevaAsistencia = {
+        empleadoId: empleadoId,
+        fecha: new Date().toLocaleDateString("es-AR"),
+        estado: "Presente"
+    };
+
+    try {
+        await axios.post(`${API_URL}/asistencias`, nuevaAsistencia);
+
+        formAsistencia.reset();
+
+        await cargarAsistencias();
+    } catch (error) {
+        console.error("Error al registrar asistencia:", error);
+    }
+}
+
+
 
 async function cargarDepartamentos() {
     try {
@@ -233,6 +299,7 @@ async function eliminarEmpleado(id) {
 
         await cargarEmpleados();
         await cargarDepartamentos();
+        await cargarSelectEmpleados();
         await cargarAsistencias();
     } catch (error) {
         console.error("Error al eliminar empleado:", error);
@@ -242,7 +309,13 @@ async function eliminarEmpleado(id) {
 
 async function cargarAsistencias() {
     try {
-        const responseAsistencias = await axios.get(`${API_URL}/asistencias`);
+        let url = `${API_URL}/asistencias`;
+
+        if (filtroEmpleadoAsistencia.value !== "") {
+            url = `${API_URL}/asistencias?empleadoId=${filtroEmpleadoAsistencia.value}`;
+        }
+
+        const responseAsistencias = await axios.get(url);
         const asistencias = responseAsistencias.data;
 
         const responseEmpleados = await axios.get(`${API_URL}/empleados`);
@@ -262,6 +335,8 @@ function renderizarAsistencias(asistencias, empleados) {
         return;
     }
 
+    asistencias.reverse();
+
     asistencias.forEach(function(asistencia) {
         const empleado = empleados.find(function(emp) {
             return emp.id === asistencia.empleadoId;
@@ -274,10 +349,48 @@ function renderizarAsistencias(asistencias, empleados) {
                 <h3>${nombreEmpleado}</h3>
                 <p>Fecha: ${asistencia.fecha}</p>
                 <p>Estado: ${asistencia.estado}</p>
+
+                <button class="btn-edit" onclick="editarEstadoAsistencia(${asistencia.id}, 'Presente')">Presente</button>
+                <button class="btn-edit" onclick="editarEstadoAsistencia(${asistencia.id}, 'Ausente')">Ausente</button>
+                <button class="btn-edit" onclick="editarEstadoAsistencia(${asistencia.id}, 'Tardanza')">Tardanza</button>
+                <button class="btn-danger" onclick="eliminarAsistencia(${asistencia.id})">Eliminar</button>
             </div>
         `;
     });
 }
+
+
+async function editarEstadoAsistencia(id, nuevoEstado) {
+    try {
+        const datos = {
+            estado: nuevoEstado
+        };
+
+        await axios.patch(`${API_URL}/asistencias/${id}`, datos);
+
+        await cargarAsistencias();
+    } catch (error) {
+        console.error("Error al editar asistencia:", error);
+    }
+}
+
+
+async function eliminarAsistencia(id) {
+    const confirmar = confirm("¿Seguro que desea eliminar esta asistencia?");
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+        await axios.delete(`${API_URL}/asistencias/${id}`);
+
+        await cargarAsistencias();
+    } catch (error) {
+        console.error("Error al eliminar asistencia:", error);
+    }
+}
+
 
 async function guardarDepartamento(event) {
     event.preventDefault();
